@@ -111,6 +111,8 @@ def determine_base_url(spec: Mapping[str, Any]) -> str:
 
 def iter_operations(spec: Mapping[str, Any], base_url: str) -> Iterable[OperationContext]:
     paths: Mapping[str, Any] = spec.get("paths", {}) or {}
+    collected: List[OperationContext] = []
+
     for path, path_item in paths.items():
         for method, operation in path_item.items():
             if method.lower() not in SUPPORTED_METHODS:
@@ -121,16 +123,21 @@ def iter_operations(spec: Mapping[str, Any], base_url: str) -> Iterable[Operatio
             tag = tags[0] if tags else "untagged"
             summary = operation.get("summary") or ""
             description = operation.get("description") or summary or ""
-            yield OperationContext(
-                method=method,
-                path=path,
-                tag=tag,
-                summary=summary,
-                description=description,
-                operation=operation,
-                base_url=base_url,
-                normalized_path=normalize_id_placeholders(path),
+            collected.append(
+                OperationContext(
+                    method=method,
+                    path=path,
+                    tag=tag,
+                    summary=summary,
+                    description=description,
+                    operation=operation,
+                    base_url=base_url,
+                    normalized_path=normalize_id_placeholders(path),
+                )
             )
+
+    for context in sorted(collected, key=lambda ctx: (ctx.tag, ctx.path, ctx.method)):
+        yield context
 
 
 def extract_fields(operation: Mapping[str, Any]) -> List[FieldInfo]:
@@ -568,7 +575,8 @@ def render_responses(responses: Mapping[str, Any]) -> str:
         return "No responses documented."
     header = "| Status | Type | Message | Description |\n| :----- | :--- | :----- | :---------- |"
     rows = []
-    for status, response in responses.items():
+    for status in sorted(responses.keys(), key=str):
+        response = responses[status]
         emoji = "🟢" if str(status).startswith(("2", "3")) else "🔴"
         description = response.get("description") if isinstance(response, Mapping) else ""
         rows.append(
