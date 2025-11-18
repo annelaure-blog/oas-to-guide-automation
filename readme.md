@@ -33,6 +33,21 @@ The generated markdown follows this structure for each operation:
 - Sample response payload derived from the response schema when available.
 - Responses table summarizing status codes and descriptions.
 
+### Default macro substitutions
+
+The generator keeps the `{version}` placeholder intact but normalizes common pagination and identifier macros with stable values
+in sample URLs and payloads to avoid merge conflicts across guides:
+
+- `pageIndex` → `0`
+- `pageSize` → `25`
+- `offset` → `0`
+- `limit` → `500`
+- `retailerId` → `12345`
+- `accountId` → `368471940340928512`
+- `parentAccountId` → `425730879617900544`
+- `campaignId` → `544937665113018368`
+- `lineItem` / `lineItemId` → `6854840188706902009`
+
 ## Development
 
 To view CLI help:

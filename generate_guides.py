@@ -31,6 +31,7 @@ DEFAULT_MACROS: Mapping[str, str] = {
     "parentAccountId": "425730879617900544",
     "campaignId": "544937665113018368",
     "lineItem": "6854840188706902009",
+    "lineItemId": "6854840188706902009",
 }
 
 
